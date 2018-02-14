@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>ulinks</title>
+    <title>Cooler News</title>
     <script src="/static/zepto.min.js"></script>
     <script src="/static/data.js"></script>
     <script src="/static/intercooler.js"></script>
@@ -18,11 +18,7 @@
 
     <div class="form-group">
       <form ic-post-to="/submit">
-        <div class="input-group">
-            <span class="input-group-addon">URL:</span>
-            <input type="text" class="form-input" id="input-url" placeholder="Submit URL">
-            <button class="btn btn-primary input-group-btn">Submit URL</button> 
-        </div>
+        {% include "index_url.html" %}
       </form>
     </div>
 

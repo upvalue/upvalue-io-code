@@ -4,8 +4,8 @@ from flask import Flask, render_template, request
 from peewee import SqliteDatabase, Model, AutoField, CharField, IntegerField, \
      DateTimeField, ForeignKeyField
 from pprint import pprint
+import urllib
 # from datetime import datetime
-# from urllib import parse
 
 db = SqliteDatabase('db.sqlite3')
 
@@ -55,10 +55,14 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/submit', methods=['POST'])
+@app.route('/submit/url', methods=['POST'])
 def submit():
+    # result = urlparse(request.form['url'])
     pprint(request.form)
-    return render_template('post.html')
+    token = urllib.parse.urlparse(request.form['url'])
+    if not all([getattr(token, check) for check in ('scheme', 'netloc',)]):
+        return render_template('index_url.html', url_error = 'Not a valid URL')
+    # return render_template('post.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
