@@ -1,1 +1,3 @@
-A micro link shortening application, built with Bottle and Intercooler.
+# Cooler News
+
+A simple HN-alike website, written with Flask and Intercooler.

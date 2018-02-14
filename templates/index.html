@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ulinks</title>
+    <script src="/static/zepto.min.js"></script>
+    <script src="/static/data.js"></script>
+    <script src="/static/intercooler.js"></script>
+    <link rel=stylesheet href="/static/spectre.min.css">
+    <link rel=stylesheet href="/static/site.css">
+  </head>
+  <body>
+    <header class="navbar">
+      <section class="navbar-section">
+        <a href="#" class="navbar-brand mr-2">Cooler News</a>
+      </section>
+
+    </header>
+
+    <div class="form-group">
+      <form action="/post" method="POST">
+        <div class="input-group">
+            <span class="input-group-addon">URL:</span>
+            <input type="text" class="form-input" id="input-url" placeholder="Submit URL">
+            <button class="btn btn-primary input-group-btn" ic-post-to="/post" ic-target="#hello">Submit URL</button> 
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
+
