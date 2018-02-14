@@ -1,9 +1,11 @@
-#from bottle import route, run, view, static_file, post, get, request, static_file
-from flask import Flask, render_template
+# app.py - Cooler News, an HN-alike website written with Flask & intercooler
+# from bottle import route, run, view, static_file, post, get, request, static_file
+from flask import Flask, render_template, request
 from peewee import SqliteDatabase, Model, AutoField, CharField, IntegerField, \
      DateTimeField, ForeignKeyField
-from datetime import datetime
-from urllib import parse
+from pprint import pprint
+# from datetime import datetime
+# from urllib import parse
 
 db = SqliteDatabase('db.sqlite3')
 
@@ -49,9 +51,14 @@ app = Flask(__name__)
 
 
 @app.route("/")
-def hello():
+def index():
     return render_template('index.html')
 
+
+@app.route('/submit', methods=['POST'])
+def submit():
+    pprint(request.form)
+    return render_template('post.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
