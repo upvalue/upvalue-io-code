@@ -1,0 +1,8 @@
+<div class="column col-8 {% if title_error %}has-error{% endif %}">
+  <label class="form-label" for="title">Title:</label>
+  <!-- <input type="text" class="form-input" id="input-Title" placeholder="Submit Title">-->
+  <input type="text" class="form-input {% if title_error %}is-error{% endif %}"
+    ic-post-to="/submit/validate-title"name="title" value="{{title}}" placeholder="Post title" 
+    ic-target="closest div" ic-replace-target="true">
+  {% if title_error %}<p class="form-input-hint">{{title_error}}</p>{% endif %}
+</div>

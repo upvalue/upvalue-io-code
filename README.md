@@ -1,3 +1,3 @@
-# Cooler News
+# Cool Links.
 
-A simple HN-alike website, written with Flask and Intercooler.
+A simple link shortener, written with Flask and Intercooler.
