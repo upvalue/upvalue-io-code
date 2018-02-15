@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Cooler News</title>
+    <title>Cool Links</title>
     <script src="/static/zepto.min.js"></script>
     <script src="/static/data.js"></script>
     <script src="/static/intercooler.js"></script>
@@ -11,17 +11,16 @@
   <body>
     <header class="navbar">
       <section class="navbar-section">
-        <a href="#" class="navbar-brand mr-2">Cooler News</a>
+        <a href="/" class="navbar-brand mr-2">Cool Links</a>
       </section>
 
     </header>
 
     {% include "submit.html" %}
 
+    <div id="my-link"></div>
 
-    <p>Story</p>
-    <p>Story</p>
-    <p>Story</p>
+    <div ic-trigger-on="load" ic-poll="10s" ic-src="/recent"></div>
   </body>
 </html>
 

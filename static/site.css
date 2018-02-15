@@ -1,3 +1,11 @@
 body { 
   padding:1em;
 }
+
+a {
+  color: #09d;
+}
+
+a:hover {
+  color: #09d;
+}

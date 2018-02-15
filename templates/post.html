@@ -1,2 +1,11 @@
-<p>{{post.title}}</p>
-<p>{{post.url}}</p>
+<div id="my-link">
+  {% if post_exists %}
+  <div class="toast toast-warning">
+    <button class="btn btn-clear" ic-action="remove" ic-target="closest div"></button>
+    Post already exists
+  </div>
+  {% endif %}
+
+  <h3>Your link</h3>
+  <p>{{post.title}} (<a href="/link/{{post.short_id}}">/link/{{post.short_id}}</a> => {{post.url}})</p>
+</div>

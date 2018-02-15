@@ -1,12 +1,11 @@
-# app.py - Cooler News, an HN-alike website written with Flask & intercooler
-# from bottle import route, run, view, static_file, post, get, request, static_file
+# app.py - Cool Links, a simple link shortener demo written
+# with flask and intercooler.js
 from datetime import datetime
-from pprint import pprint
 import urllib
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from peewee import SqliteDatabase, Model, AutoField, CharField, IntegerField, \
-     DateTimeField, ForeignKeyField
+     DateTimeField, IntegrityError
 
 db = SqliteDatabase('db.sqlite3')
 
@@ -18,13 +17,37 @@ class BaseModel(Model):
 
 class Post(BaseModel):
     id = AutoField()
+    short_id = CharField()
     created_at = DateTimeField()
     title = CharField()
-    url = CharField()
-    username = CharField()
+    url = CharField(unique=True)
+
+    def relative_time(self):
+        diff = datetime.now() - self.created_at
+
+        if diff.days > 1:
+            return f'{diff.days} days ago'
+        elif diff.seconds > 3600:
+            return f'{diff.seconds // 3600} hours ago'
+        elif diff.seconds > 60:
+            return f'{diff.seconds // 60} minutes ago'
+        else:
+            return 'just now'
 
 
-db.create_tables([Post])
+class Settings(BaseModel):
+    id = AutoField()
+    letter = IntegerField()
+    number = IntegerField()
+
+
+db.create_tables([Post, Settings])
+
+settings = Settings.get_or_none(id=1)
+
+if not settings:
+    settings = Settings.create(letter=ord('a'), number=0)
+    settings.save()
 
 
 app = Flask(__name__)
@@ -36,6 +59,7 @@ def index():
 
 
 def valid_url(url):
+    "Check URL validity"
     token = urllib.parse.urlparse(url)
     return all([getattr(token, check) for check in ('scheme', 'netloc',)])
 
@@ -43,7 +67,6 @@ def valid_url(url):
 @app.route('/submit/validate-url', methods=['POST'])
 def validate_url():
     "Validate submission URL"
-    # result = urlparse(request.form['url'])
     if not valid_url(request.form['url']):
         return render_template('index_url.html', url_error='Not a valid URL',
                                url=request.form['url'])
@@ -59,6 +82,21 @@ def validate_title():
                                title_error='Title must be '
                                'between 3 and 255 characters')
     return render_template('index_title.html', title=request.form['title'])
+
+
+@app.route('/recent', methods=['GET'])
+def recent():
+    posts = Post.select().order_by(Post.created_at.desc()).limit(10)
+
+    return render_template('recent.html', posts=posts)
+
+
+@app.route('/link/<shortid>')
+def link(shortid):
+    post = Post.get_or_none(short_id=shortid)
+    if not post:
+        return f'Link {shortid} not found', 404
+    return redirect(post.url)
 
 
 @app.route('/submit', methods=['POST'])
@@ -77,9 +115,27 @@ def submit():
                                title_error='Title must be'
                                ' between 3 and 255 characters')
 
-    post = Post.create(created_at=datetime.now(), title=title, url=url, username='guest')
+    post = Post.get_or_none(url=url)
 
-    return render_template('post.html', post=post)
+    if post:
+        return render_template('post.html', post=post, post_exists=True)
+    else:
+        short_field = f'{chr(settings.letter)}{settings.number}'
+
+        try:
+            with db.atomic():
+                settings.letter = settings.letter + 1
+                if settings.letter == ord('z') + 1:
+                    settings.letter = ord('a')
+                    settings.number += 1
+                settings.save()
+                post = Post.create(created_at=datetime.now(),
+                                   short_id=short_field,
+                                   title=title, url=url)
+        except IntegrityError:
+            return 'DB integrity error'
+
+        return render_template('post.html', post=post)
 
 
 if __name__ == '__main__':

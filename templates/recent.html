@@ -1,0 +1,14 @@
+  <h3>Recent links</h3>
+  {% if posts %}
+    {% for post in posts %}
+    <div class="columns col-10">
+      <div class="column col-1">
+        {{post.relative_time()}}
+      </div>
+      <div class="column col-9 link">
+        <a href="{{post.url}}">{{post.title}}</a> (<a href="/link/{{post.short_id}}">/link/{{post.short_id}}</a> => {{post.url}})</a>
+      </div>
+    </div>
+    {% endfor %}
+
+  {% endif %}
