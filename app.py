@@ -3,7 +3,8 @@
 from datetime import datetime
 import urllib
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, \
+    after_this_request
 from peewee import SqliteDatabase, Model, AutoField, CharField, IntegerField, \
      DateTimeField, IntegrityError
 
@@ -23,6 +24,7 @@ class Post(BaseModel):
     url = CharField(unique=True)
 
     def relative_time(self):
+        "Return relative time (e.g. x hours ago, x days ago)"
         diff = datetime.now() - self.created_at
 
         if diff.days > 1:
@@ -45,6 +47,7 @@ db.create_tables([Post, Settings])
 
 settings = Settings.get_or_none(id=1)
 
+# Lazily create settings
 if not settings:
     settings = Settings.create(letter=ord('a'), number=0)
     settings.save()
@@ -93,10 +96,20 @@ def recent():
 
 @app.route('/link/<shortid>')
 def link(shortid):
+    "Visit a link"
     post = Post.get_or_none(short_id=shortid)
     if not post:
         return f'Link {shortid} not found', 404
     return redirect(post.url)
+
+
+@app.route('/view/<shortid>', methods=['GET'])
+def view(shortid):
+    "View a link"
+    post = Post.get_or_none(short_id=shortid)
+    if not post:
+        return f'Link {shortid} not found', 404
+    return render_template('index.html', post=post)
 
 
 @app.route('/submit', methods=['POST'])
@@ -116,11 +129,19 @@ def submit():
                                ' between 3 and 255 characters')
 
     post = Post.get_or_none(url=url)
+    short_id = (post and post.short_id) or \
+        f'{chr(settings.letter)}{settings.number}'
+
+    # Emend URL to reflect URL submission
+    @after_this_request
+    def add_url(res):
+        res.headers['X-IC-PushURL'] = f'/view/{short_id}'
+        return res
 
     if post:
-        return render_template('post.html', post=post, post_exists=True)
+        return render_template('post.html', post=post,
+                               post_exists=True)
     else:
-        short_field = f'{chr(settings.letter)}{settings.number}'
 
         try:
             with db.atomic():
@@ -130,7 +151,7 @@ def submit():
                     settings.number += 1
                 settings.save()
                 post = Post.create(created_at=datetime.now(),
-                                   short_id=short_field,
+                                   short_id=short_id,
                                    title=title, url=url)
         except IntegrityError:
             return 'DB integrity error'

@@ -6,6 +6,8 @@
   </div>
   {% endif %}
 
+  {% if post %}
   <h3>Your link</h3>
   <p>{{post.title}} (<a href="/link/{{post.short_id}}">/link/{{post.short_id}}</a> => {{post.url}})</p>
+  {% endif %}
 </div>
