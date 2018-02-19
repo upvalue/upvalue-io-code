@@ -118,12 +118,12 @@ def submit():
     title = request.form['title']
 
     if not valid_url(request.form['url']):
-        return render_template('submit.html',
+        return render_template('form_submit.html',
                                url=request.form['url'],
                                title=request.form['title'],
                                url_error='Not a valid URL')
     elif len(title) < 3 or len(title) > 255:
-        return render_template('submit.html', url=request.form['url'],
+        return render_template('form_submit.html', url=request.form['url'],
                                title=request.form['title'],
                                title_error='Title must be'
                                ' between 3 and 255 characters')
@@ -135,6 +135,7 @@ def submit():
     # Emend URL to reflect URL submission
     @after_this_request
     def add_url(res):
+        res.headers['X-IC-Title'] = f'Cool Links: {title}'
         res.headers['X-IC-PushURL'] = f'/view/{short_id}'
         return res
 

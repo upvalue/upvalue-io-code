@@ -1,6 +1,5 @@
 <div class="column col-3 {% if url_error %}has-error{% endif %}">
   <label class="form-label" for="url">URL:</label>
-  <!-- <input type="text" class="form-input" id="input-url" placeholder="Submit URL">-->
   <input type="url" class="form-input {% if url_error %}is-error{% endif %}"
     ic-post-to="/submit/validate-url" name="url" value="{{url}}" placeholder="Site URL" 
     ic-target="closest div" ic-replace-target="true">
